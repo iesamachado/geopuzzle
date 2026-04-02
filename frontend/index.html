@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador Heightmap 3D</title>
+    
+    <!-- Fuentes y Estilos Base -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="creator-view">
+        <div class="app-layout">
+            <!-- Panel Izquierdo: Controles -->
+        <aside class="sidebar">
+            <header>
+                <h1>Maps3D Heightmaker</h1>
+                <p>Extrae topografía real a escala de grises para impresoras 3D (Cura, PrusaSlicer).</p>
+            </header>
+
+            <div class="settings-panel">
+                <div class="form-group search-group">
+                    <label for="location-search">Ir a una Ubicación</label>
+                    <div class="search-box">
+                        <input type="text" id="location-search" placeholder="Ej. Monte Everest, Pirineos...">
+                        <button id="btn-search" class="btn btn-secondary">Buscar</button>
+                    </div>
+                </div>
+
+                <div class="form-group" style="display:flex; gap: 12px; margin-bottom: 8px;">
+                    <div style="flex: 1;">
+                        <label for="total-size-x">Total Ancho (X)</label>
+                        <div class="input-with-unit">
+                            <input type="number" id="total-size-x" value="600" min="50" step="50">
+                            <span>mm</span>
+                        </div>
+                    </div>
+                    <div style="flex: 1;">
+                        <label for="total-size-y">Total Fondo (Y)</label>
+                        <div class="input-with-unit">
+                            <input type="number" id="total-size-y" value="600" min="50" step="50">
+                            <span>mm</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group" style="display:flex; gap: 12px; margin-bottom: 8px;">
+                    <div style="flex: 1;">
+                        <label for="bed-size">Cama Impresora X/Y</label>
+                        <div class="input-with-unit">
+                            <input type="number" id="bed-size" value="200" min="50" step="10">
+                            <span>mm</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Altura Z Escala Exagerada</label>
+                    <div class="input-with-unit" style="margin-bottom: 4px;">
+                        <input type="number" id="z-scale-input" value="15" min="1" step="1">
+                        <span>mm</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:5px;">
+                        <small>Z Recomendada: <strong id="auto-z-val" style="color:var(--accent-color)">-- mm</strong></small>
+                        <button id="btn-apply-autoz" class="btn btn-secondary" style="padding: 2px 8px; font-size: 11px;">Autocalcular Z</button>
+                    </div>
+                </div>
+                
+                <div class="form-group" style="display:none;">
+                    <label for="max-height">Altura Máxi (Oculta backend)</label>
+                    <input type="number" id="max-height" value="4000">
+                </div>
+
+                <div class="form-group">
+                    <label class="toggle-control">
+                        <input type="checkbox" id="invert-colors">
+                        <span class="control-indicator"></span>
+                        <span class="control-label">Invertir Colores</span>
+                    </label>
+                    <small>Requerido por impresoras donde el blanco es relieve max.</small>
+                </div>
+
+                <button id="generate-btn" class="btn btn-primary" disabled>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                    <span>Generar Heightmap</span>
+                </button>
+            </div>
+
+            <div class="preview-panel">
+                <h3>Previsualización</h3>
+                <div class="canvas-container">
+                    <div id="loader" class="loader hidden"></div>
+                    <canvas id="heightmap-canvas" width="1024" height="1024"></canvas>
+                </div>
+                
+                <button id="download-btn" class="btn btn-secondary hidden" style="margin-top: 10px; background-color: #334155;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    <span>Descargar Imagen RAW (PNG)</span>
+                </button>
+                
+                <button id="download-stl-btn" class="btn btn-success hidden" style="margin-top: 10px;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+                    <span id="txt-stl-btn">Descargar Puzle 3D (.ZIP)</span>
+                </button>
+                <div id="output-info" class="output-info hidden"></div>
+            </div>
+        </aside>
+
+        <!-- Panel Derecho: Visor de Mapa -->
+        <main class="map-view">
+            <div id="map"></div>
+            
+            <!-- Superposición de Selección Cuadrada Intocable (Fija en el centro) -->
+            <div class="selector-overlay">
+                <div class="selector-square" id="selector-square">
+                    <div class="corner top-left"></div>
+                    <div class="corner top-right"></div>
+                    <div class="corner bottom-left"></div>
+                    <div class="corner bottom-right"></div>
+                    <div class="crosshair"></div>
+                </div>
+            </div>
+            
+            <div class="map-instructions">
+                <div class="badge">Encuadra la zona objetivo dentro del recuadro brillante.</div>
+            </div>
+        </main>
+        </div>
+    </div> <!-- Final Creator View -->
+
+    <!-- VISTA DASHBOARD ONDEMAND -->
+    <div id="downloader-view" class="downloader-layout hidden">
+        <header class="downloader-header">
+            <h2>Gestor de Piezas del Puzle</h2>
+            <button id="btn-back-creator" class="btn btn-secondary">Volver al Mapa</button>
+        </header>
+        <div class="downloader-content">
+            <div class="guide-panel">
+                <h3>Guía de Montaje</h3>
+                <img id="job-guide-img" src="" alt="Guia de montaje" style="max-width: 100%; object-fit: contain; border-radius: 8px;">
+            </div>
+            <div class="pieces-panel">
+                <h3>Descargar STLs Individuales</h3>
+                <p>Haz clic en cada botón para generar y descargar su geometría 3D en Altísima Resolución (1024).</p>
+                <div id="pieces-grid" class="pieces-grid">
+                    <!-- Botones injectados aqui via JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Librerías -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    
+    <!-- Librerías de la Fase 2: Mallas y Zips -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/exporters/STLExporter.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    
+    <!-- Lógica de la aplicación -->
+    <script src="js/app.js?v=6"></script>
+</body>
+</html>

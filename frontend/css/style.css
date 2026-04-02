@@ -1,0 +1,512 @@
+:root {
+    --bg-color: #0f172a;
+    --sidebar-bg: #1e293b;
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --border-color: #334155;
+    --accent-color: #3b82f6;
+    --accent-hover: #2563eb;
+    --success-color: #10b981;
+    --success-hover: #059669;
+    --error-color: #ef4444;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    line-height: 1.5;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.app-layout {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 400px;
+    background-color: var(--sidebar-bg);
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    flex-shrink: 0;
+}
+
+.sidebar header {
+    padding: 24px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.sidebar header h1 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    background: linear-gradient(90deg, #38bdf8, #818cf8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.sidebar header p {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+.settings-panel {
+    padding: 24px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.form-group.required label::after {
+    content: " *";
+    color: var(--error-color);
+}
+
+input[type="text"],
+input[type="password"],
+input[type="number"] {
+    width: 100%;
+    background-color: #0f172a;
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    padding: 10px 12px;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 0.875rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+input:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
+}
+
+.input-with-unit {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-with-unit input {
+    padding-right: 36px;
+}
+
+.input-with-unit span {
+    position: absolute;
+    right: 12px;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    pointer-events: none;
+}
+
+.form-group small {
+    display: block;
+    margin-top: 6px;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.form-group small a {
+    color: var(--accent-color);
+    text-decoration: none;
+}
+
+.form-group small a:hover {
+    text-decoration: underline;
+}
+
+/* Search Box */
+.search-box {
+    display: flex;
+    gap: 8px;
+}
+
+.search-box input {
+    flex-grow: 1;
+}
+
+.btn-secondary {
+    background-color: var(--border-color);
+    color: var(--text-primary);
+    padding: 10px 16px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-secondary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn-secondary:not(:disabled):hover {
+    background-color: #475569;
+}
+
+/* Toggle Checkbox */
+.toggle-control {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.toggle-control input {
+    display: none;
+}
+
+.control-indicator {
+    width: 44px;
+    height: 24px;
+    background-color: #0f172a;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    position: relative;
+    transition: background-color 0.2s;
+    margin-right: 12px;
+}
+
+.control-indicator::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 18px;
+    height: 18px;
+    background-color: var(--text-secondary);
+    border-radius: 50%;
+    transition: transform 0.2s, background-color 0.2s;
+}
+
+.toggle-control input:checked + .control-indicator {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+}
+
+.toggle-control input:checked + .control-indicator::after {
+    transform: translateX(20px);
+    background-color: white;
+}
+
+/* Buttons */
+.btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    gap: 8px;
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn-primary {
+    background-color: var(--accent-color);
+    color: white;
+}
+
+.btn-primary:not(:disabled):hover {
+    background-color: var(--accent-hover);
+}
+
+.btn-success {
+    background-color: var(--success-color);
+    color: white;
+    margin-top: 16px;
+}
+
+.btn-success:not(:disabled):hover {
+    background-color: var(--success-hover);
+}
+
+/* Preview */
+.preview-panel {
+    padding: 24px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.preview-panel h3 {
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-secondary);
+    margin-bottom: 12px;
+}
+
+.canvas-container {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    background-color: #000;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.canvas-container canvas {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    image-rendering: pixelated;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.output-info {
+    margin-top: 12px;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    text-align: center;
+}
+
+/* Loader */
+.loader {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    border: 4px solid var(--border-color);
+    border-top-color: var(--accent-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    z-index: 10;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Map Area */
+.map-view {
+    flex-grow: 1;
+    position: relative;
+    background-color: #000;
+}
+
+#map {
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+.selector-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 400; /* Above Leaflet overlay panes */
+}
+
+/* Fixed exactly 1024x1024 map context ratio (or responsive version of it) 
+   Let's make the visual square 60% of the map height
+*/
+.selector-square {
+    width: 60vh;
+    height: 60vh;
+    max-width: 60vw;
+    max-height: 60vw;
+    border: 2px dashed rgba(255, 255, 255, 0.7);
+    background-color: rgba(59, 130, 246, 0.1);
+    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5);
+    position: relative;
+}
+
+.selector-square .corner {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    border: 4px solid var(--accent-color);
+}
+
+.top-left { top: -2px; left: -2px; border-right: none; border-bottom: none; }
+.top-right { top: -2px; right: -2px; border-left: none; border-bottom: none; }
+.bottom-left { bottom: -2px; left: -2px; border-right: none; border-top: none; }
+.bottom-right { bottom: -2px; right: -2px; border-left: none; border-top: none; }
+
+.crosshair {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    transform: translate(-50%, -50%);
+}
+.crosshair::before, .crosshair::after {
+    content: '';
+    position: absolute;
+    background-color: rgba(255, 255, 255, 0.5);
+}
+.crosshair::before { width: 100%; height: 2px; top: 9px; left: 0; }
+.crosshair::after { width: 2px; height: 100%; top: 0; left: 9px; }
+
+.map-instructions {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 500;
+    pointer-events: none;
+}
+
+.badge {
+    background-color: rgba(15, 23, 42, 0.85);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    backdrop-filter: blur(4px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* Modificadores Leaflet Dark */
+.leaflet-container {
+    background: #000;
+}
+.leaflet-bar {
+    border: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+.leaflet-bar a {
+    background-color: var(--sidebar-bg);
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border-color);
+}
+.leaflet-bar a:hover {
+    background-color: #334155;
+    color: white;
+}
+
+/* Downloader / Dashboard View */
+.downloader-layout {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100vw;
+    background-color: var(--bg-color);
+}
+
+.downloader-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    background-color: var(--sidebar-bg);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.downloader-header h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.downloader-content {
+    display: flex;
+    flex-direction: row;
+    flex-grow: 1;
+    overflow: hidden;
+}
+
+.guide-panel {
+    flex: 1;
+    padding: 24px;
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    background-color: #0b1120;
+}
+
+.pieces-panel {
+    flex: 1;
+    padding: 24px;
+    overflow-y: auto;
+    background-color: var(--bg-color);
+}
+
+.pieces-panel h3 {
+    margin-bottom: 8px;
+    font-size: 1.2rem;
+}
+
+.pieces-panel p {
+    color: var(--text-secondary);
+    margin-bottom: 24px;
+    font-size: 0.9rem;
+}
+
+.pieces-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 16px;
+}
+
+.piece-btn {
+    background-color: var(--sidebar-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    padding: 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.piece-btn:hover:not(:disabled) {
+    background-color: #334155;
+    border-color: var(--accent-color);
+    transform: translateY(-2px);
+}
+
+.piece-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.piece-icon {
+    font-size: 24px;
+}

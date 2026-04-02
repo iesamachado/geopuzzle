@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  frontend:
+    build: 
+      context: ./frontend
+    ports:
+      - "8000:80"
+    depends_on:
+      - backend
+
+  backend:
+    build: 
+      context: ./backend
+    ports:
+      - "3000:3000"
+    environment:
+      # Asignamos hasta 8GB de RAM al motor V8 de Node para poder exportar matrices masivas
+      - NODE_OPTIONS=--max_old_space_size=8192
+      - PORT=3000
