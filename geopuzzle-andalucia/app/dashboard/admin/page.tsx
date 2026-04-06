@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { useRouter } from 'next/navigation';
 import { obtenerSolicitudes, actualizarEstadoSolicitud } from '@/lib/firestore';
+import { seedCuadrantes } from '@/lib/seed-firestore';
 import { Solicitud } from '@/lib/types';
 
 export default function AdminPage() {
@@ -13,6 +14,7 @@ export default function AdminPage() {
   const [loadingSols, setLoadingSols] = useState(true);
   const [updating, setUpdating] = useState<string | null>(null);
   const [filter, setFilter] = useState<'todos' | 'pendiente' | 'aprobado' | 'rechazado'>('pendiente');
+  const [seeding, setSeeding] = useState(false);
 
   useEffect(() => {
     if (!loading && !isAdmin) router.push('/dashboard');
@@ -31,6 +33,20 @@ export default function AdminPage() {
     await actualizarEstadoSolicitud(id, estado, uid);
     await loadSolicitudes();
     setUpdating(null);
+  }
+
+  async function handleSeed() {
+    if (!confirm('¿Seguro que quieres inicializar los cuadrantes? Esto sobreescribirá los datos existentes.')) return;
+    setSeeding(true);
+    try {
+      await seedCuadrantes();
+      alert('Cuadrantes inicializados con éxito.');
+    } catch (error) {
+      console.error(error);
+      alert('Error al inicializar cuadrantes.');
+    } finally {
+      setSeeding(false);
+    }
   }
 
   const filtered = filter === 'todos' ? solicitudes : solicitudes.filter(s => s.estado === filter);
@@ -164,6 +180,21 @@ export default function AdminPage() {
           ))}
         </div>
       </div>
+      {/* Seeding Section */}
+      <div style={{ marginTop: '48px', padding: '24px', border: '1px dashed var(--color-border)', borderRadius: '12px' }}>
+        <h2 style={{ fontSize: '1.2rem', marginBottom: '8px' }}>🛠️ Mantenimiento</h2>
+        <p style={{ fontSize: '0.9rem', color: 'var(--color-text-muted)', marginBottom: '16px' }}>
+          Solo usar en la configuración inicial o para reiniciar el mapa.
+        </p>
+        <button 
+          className="btn btn-secondary" 
+          onClick={handleSeed}
+          disabled={seeding}
+        >
+          {seeding ? 'Inicializando...' : 'Inicializar Cuadrantes (20 piezas)'}
+        </button>
+      </div>
+
     </div>
   );
 }
