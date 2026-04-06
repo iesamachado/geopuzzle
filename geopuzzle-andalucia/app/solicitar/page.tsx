@@ -1,10 +1,9 @@
-'use client';
-
-import { useState } from 'react';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { useState, useEffect } from 'react';
+import { signInWithPopup } from 'firebase/auth';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
-import { auth, db } from '@/lib/firebase';
+import { auth, db, googleProvider } from '@/lib/firebase';
 import { crearSolicitud } from '@/lib/firestore';
+import { useAuth } from '@/lib/auth-context';
 import Navbar from '@/components/Navbar';
 import Link from 'next/link';
 import styles from './solicitar.module.css';
@@ -22,13 +21,13 @@ const DEPARTAMENTOS = [
 ];
 
 export default function SolicitarPage() {
+  const { user: currentUser } = useAuth();
   const [step, setStep] = useState<1 | 2 | 'done'>(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
   const [form, setForm] = useState({
     email: '',
-    password: '',
     nombre: '',
     telefono: '',
     centroeducativo: '',
@@ -40,21 +39,52 @@ export default function SolicitarPage() {
     experiencia3d: false,
   });
 
+  // Si ya está logueado, pre-rellenar
+  useEffect(() => {
+    if (currentUser) {
+      setForm(f => ({
+        ...f,
+        email: currentUser.email || '',
+        nombre: currentUser.displayName || f.nombre,
+      }));
+    }
+  }, [currentUser]);
+
   const set = (k: string, v: string | boolean) => setForm(f => ({ ...f, [k]: v }));
+
+  async function handleGoogleIdentify() {
+    setLoading(true);
+    setError('');
+    try {
+      const { user } = await signInWithPopup(auth, googleProvider);
+      setForm(f => ({
+        ...f,
+        email: user.email || '',
+        nombre: user.displayName || '',
+      }));
+      setStep(2);
+    } catch (err: any) {
+      console.error(err);
+      setError('Error al identificarte con Google.');
+    } finally {
+      setLoading(false);
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (!currentUser) return; // No debería pasar si estamos en el step 2
+
     setLoading(true);
     setError('');
 
     try {
-      // 1. Crear usuario en Firebase Auth
-      const { user } = await createUserWithEmailAndPassword(auth, form.email, form.password);
-
-      // 2. Crear perfil del usuario en Firestore
-      await setDoc(doc(db, 'usuarios', user.uid), {
-        uid: user.uid,
-        email: form.email,
+      // 1. El usuario ya ha sido creado/autenticado por Google en Step 1
+      
+      // 2. Crear/Actualizar perfil del usuario en Firestore (en estado pendiente)
+      await setDoc(doc(db, 'usuarios', currentUser.uid), {
+        uid: currentUser.uid,
+        email: currentUser.email,
         nombre: form.nombre,
         centroeducativo: form.centroeducativo,
         provincia: form.provincia,
@@ -64,7 +94,7 @@ export default function SolicitarPage() {
 
       // 3. Crear solicitud visible para el admin
       await crearSolicitud({
-        uid: user.uid,
+        uid: currentUser.uid,
         nombre: form.nombre,
         email: form.email,
         telefono: form.telefono,
@@ -79,14 +109,8 @@ export default function SolicitarPage() {
 
       setStep('done');
     } catch (err: any) {
-      const code = err?.code || '';
-      if (code === 'auth/email-already-in-use') {
-        setError('Este email ya está registrado. ¿Quizás ya enviaste una solicitud? Prueba a iniciar sesión.');
-      } else if (code === 'auth/weak-password') {
-        setError('La contraseña debe tener al menos 6 caracteres.');
-      } else {
-        setError(`Error al enviar la solicitud: ${err.message}`);
-      }
+      console.error(err);
+      setError(`Error al enviar la solicitud: ${err.message}`);
     } finally {
       setLoading(false);
     }
@@ -104,7 +128,7 @@ export default function SolicitarPage() {
               Hemos recibido tu solicitud de participación en el proyecto <strong>GeoPuzzle 3D Andalucía</strong>.
             </p>
             <p>
-              El equipo coordinador revisará tus datos y recibirás un email de confirmación cuando
+              El equipo coordinador revisará tus datos y recibirás una confirmación cuando
               tu acceso sea aprobado. Esto suele tardar 1–3 días hábiles.
             </p>
             <Link href="/" className="btn btn-primary" style={{ marginTop: '24px' }}>
@@ -128,47 +152,79 @@ export default function SolicitarPage() {
 
           {/* Steps indicator */}
           <div className={styles.steps}>
-            <div className={`${styles.stepItem} ${step >= 1 ? styles.active : ''}`}>
-              <span className={styles.stepNum}>1</span> Acceso
+            <div className={`${styles.stepItem} ${step === 1 ? styles.active : ''}`}>
+              <span className={styles.stepNum}>1</span> Identificación
             </div>
             <div className={styles.stepLine} />
-            <div className={`${styles.stepItem} ${step >= 2 ? styles.active : ''}`}>
+            <div className={`${styles.stepItem} ${step === 2 ? styles.active : ''}`}>
               <span className={styles.stepNum}>2</span> Centro y Datos
             </div>
           </div>
 
           <form onSubmit={handleSubmit}>
             {step === 1 && (
+              <div className={styles.formSection} style={{ textAlign: 'center' }}>
+                <div style={{ marginBottom: '24px' }}>
+                  <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" width="60" height="60" style={{ marginBottom: '16px' }} />
+                  <h2>Identificación Docente</h2>
+                  <p style={{ color: 'var(--color-text-muted)', fontSize: '0.95rem' }}>
+                    Utiliza tu cuenta institucional o personal facilitada por el centro.
+                  </p>
+                </div>
+
+                {!currentUser ? (
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    style={{ 
+                      width: '100%', 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'center', 
+                      gap: '12px',
+                      padding: '12px',
+                      fontSize: '1rem'
+                    }}
+                    onClick={handleGoogleIdentify}
+                    disabled={loading}
+                  >
+                    {loading ? <span className="spinner-sm"></span> : 'Identificarse con Google'}
+                  </button>
+                ) : (
+                  <div className="card" style={{ padding: '20px', border: '1px solid var(--color-acento)' }}>
+                    <div style={{ fontSize: '0.85rem', color: 'var(--color-acento)', marginBottom: '8px', fontWeight: 600 }}>
+                      YA IDENTIFICADO COMO:
+                    </div>
+                    <div style={{ fontWeight: 600, fontSize: '1.1rem' }}>{currentUser.displayName}</div>
+                    <div style={{ color: 'var(--color-text-muted)', marginBottom: '16px' }}>{currentUser.email}</div>
+                    <button
+                      type="button"
+                      className="btn btn-primary"
+                      style={{ width: '100%' }}
+                      onClick={() => setStep(2)}
+                    >
+                      Continuar al Paso 2 →
+                    </button>
+                    <button 
+                      type="button"
+                      onClick={() => auth.signOut()}
+                      style={{ background: 'none', border: 'none', color: 'var(--color-rojo)', fontSize: '0.8rem', marginTop: '12px', cursor: 'pointer' }}
+                    >
+                      Cerrar sesión e identificarme con otra cuenta
+                    </button>
+                  </div>
+                )}
+
+                {error && <div className="alert alert-error" style={{ marginTop: '16px' }}>{error}</div>}
+              </div>
+            )}
+
+            {step === 2 && (
               <div className={styles.formSection}>
-                <h2>Datos de Acceso</h2>
+                <h2>Datos del Centro y Docente</h2>
 
                 <div className="form-group">
-                  <label>Email institucional *</label>
-                  <input
-                    type="email"
-                    className="form-control"
-                    required
-                    value={form.email}
-                    onChange={e => set('email', e.target.value)}
-                    placeholder="tu@iescorreoprofesional.es"
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label>Contraseña *</label>
-                  <input
-                    type="password"
-                    className="form-control"
-                    required
-                    minLength={6}
-                    value={form.password}
-                    onChange={e => set('password', e.target.value)}
-                    placeholder="Mínimo 6 caracteres"
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label>Nombre completo *</label>
+                  <label>Tu nombre completo (para certificados) *</label>
                   <input
                     type="text"
                     className="form-control"
@@ -178,28 +234,6 @@ export default function SolicitarPage() {
                     placeholder="Ej. María García López"
                   />
                 </div>
-
-                <button
-                  type="button"
-                  className="btn btn-primary"
-                  style={{ width: '100%', marginTop: '8px' }}
-                  onClick={() => {
-                    if (!form.email || !form.password || !form.nombre) {
-                      setError('Completa todos los campos obligatorios.');
-                      return;
-                    }
-                    setError('');
-                    setStep(2);
-                  }}
-                >
-                  Siguiente →
-                </button>
-              </div>
-            )}
-
-            {step === 2 && (
-              <div className={styles.formSection}>
-                <h2>Datos del Centro</h2>
 
                 <div className={styles.formRow}>
                   <div className="form-group">
@@ -251,29 +285,30 @@ export default function SolicitarPage() {
                   </div>
                 </div>
 
-                <div className="form-group">
-                  <label>Teléfono de contacto</label>
-                  <input
-                    type="tel"
-                    className="form-control"
-                    value={form.telefono}
-                    onChange={e => set('telefono', e.target.value)}
-                    placeholder="600 000 000"
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label>Departamento *</label>
-                  <select
-                    className="form-control"
-                    value={form.departamento}
-                    onChange={e => set('departamento', e.target.value)}
-                    required
-                  >
-                    {DEPARTAMENTOS.map(d => (
-                      <option key={d.value} value={d.value}>{d.label}</option>
-                    ))}
-                  </select>
+                <div className={styles.formRow}>
+                  <div className="form-group">
+                    <label>Teléfono de contacto</label>
+                    <input
+                      type="tel"
+                      className="form-control"
+                      value={form.telefono}
+                      onChange={e => set('telefono', e.target.value)}
+                      placeholder="600 000 000"
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Departamento *</label>
+                    <select
+                      className="form-control"
+                      value={form.departamento}
+                      onChange={e => set('departamento', e.target.value)}
+                      required
+                    >
+                      {DEPARTAMENTOS.map(d => (
+                        <option key={d.value} value={d.value}>{d.label}</option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
 
                 <div className="form-group">
@@ -289,7 +324,7 @@ export default function SolicitarPage() {
                   />
                 </div>
 
-                <label style={{ display: 'flex', gap: '12px', alignItems: 'flex-start', cursor: 'pointer', fontSize: '0.9rem', color: 'var(--color-text-muted)' }}>
+                <label style={{ display: 'flex', gap: '12px', alignItems: 'flex-start', cursor: 'pointer', fontSize: '0.9rem', color: 'var(--color-text-muted)', marginBottom: '24px' }}>
                   <input
                     type="checkbox"
                     checked={form.experiencia3d}
@@ -299,9 +334,9 @@ export default function SolicitarPage() {
                   Nuestro instituto dispone de impresora 3D operativa o prevé disponer de una para el proyecto.
                 </label>
 
-                {error && <div className="alert alert-error" style={{ marginTop: '16px' }}>{error}</div>}
+                {error && <div className="alert alert-error" style={{ marginBottom: '16px' }}>{error}</div>}
 
-                <div style={{ display: 'flex', gap: '12px', marginTop: '24px' }}>
+                <div style={{ display: 'flex', gap: '12px' }}>
                   <button
                     type="button"
                     className="btn btn-secondary"

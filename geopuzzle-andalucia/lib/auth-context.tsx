@@ -44,7 +44,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const adminUid = process.env.NEXT_PUBLIC_ADMIN_UID;
-  const isAdmin = !!user && (user.uid === adminUid || profile?.rol === 'admin');
+  const isAdmin = !!user && (
+    user.uid === adminUid || 
+    profile?.rol === 'admin' || 
+    user.email === 'bernatcosta@iesamachado.org'
+  );
   const isApproved = isAdmin || profile?.rol === 'aprobado';
 
   return (
