@@ -1,0 +1,67 @@
+name: Deploy GeoPuzzle Andalucía a GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'geopuzzle-andalucia/**'
+      - '.github/workflows/deploy-geopuzzle.yml'
+
+  # Permite lanzarlo manualmente desde la pestaña Actions
+  workflow_dispatch:
+
+# Permisos necesarios para desplegar en gh-pages
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: geopuzzle-andalucia/package-lock.json
+
+      - name: Instalar dependencias
+        working-directory: geopuzzle-andalucia
+        run: npm ci
+
+      - name: Build de producción (export estático)
+        working-directory: geopuzzle-andalucia
+        env:
+          # Variables de Firebase — añádelas como Secrets en tu repositorio:
+          # GitHub repo → Settings → Secrets and variables → Actions → New repository secret
+          NEXT_PUBLIC_FIREBASE_API_KEY: ${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY }}
+          NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ${{ secrets.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN }}
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
+          NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: ${{ secrets.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET }}
+          NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID }}
+          NEXT_PUBLIC_FIREBASE_APP_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_APP_ID }}
+          NEXT_PUBLIC_ADMIN_UID: ${{ secrets.NEXT_PUBLIC_ADMIN_UID }}
+          # Si el sitio no está en dominio propio, indica aquí el nombre del repo:
+          # NEXT_PUBLIC_BASE_PATH: /nombre-del-repositorio
+          NEXT_PUBLIC_BASE_PATH: ${{ secrets.NEXT_PUBLIC_BASE_PATH }}
+        run: npm run build
+
+      # El build estático queda en geopuzzle-andalucia/out
+      # Añadimos .nojekyll para que GitHub Pages sirva la carpeta _next correctamente
+      - name: Añadir .nojekyll
+        run: touch geopuzzle-andalucia/out/.nojekyll
+
+      - name: Desplegar en GitHub Pages (rama gh-pages)
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: geopuzzle-andalucia/out
+          publish_branch: gh-pages
+          commit_message: 'deploy: GeoPuzzle Andalucía [${{ github.sha }}]'

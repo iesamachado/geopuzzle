@@ -20,4 +20,6 @@ services:
       # Se mantiene el aumento de memoria vital para las exportaciones STL grandes
       - NODE_OPTIONS=--max_old_space_size=8192
       - PORT=3000
+    volumes:
+      - ./backend/jobs:/app/jobs
     restart: always

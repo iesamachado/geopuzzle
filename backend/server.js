@@ -5,13 +5,18 @@ const { generate3DMeshes } = require('./mesher');
 
 const app = express();
 
-// Permite peticiones CORS desde el frontend
-app.use(cors());
+// Permite peticiones CORS desde el frontend y exponemos la cabecera X-Job-Id
+app.use(cors({ exposedHeaders: ['X-Job-Id'] }));
 
-// Aceptar payloads binarios grandes (Elevations Float32Array puede pesar ~5MB-10MB)
+// Aceptar payloads binarios grandes.
+// Un mapa de 1200x750 a 1024 muestras/pieza puede generar arrays de elevation >200MB
 const upload = multer({ 
     storage: multer.memoryStorage(),
-    limits: { fileSize: 100 * 1024 * 1024 } // Límite de 100MB
+    limits: {
+        fileSize: 500 * 1024 * 1024,  // 500MB por archivo
+        fieldSize: 10 * 1024 * 1024,   // 10MB para campos JSON (metadata)
+        files: 600,                     // máximo de archivos simultáneos
+    }
 });
 
 const fs = require('fs');
@@ -135,6 +140,40 @@ app.get('/api/generate-piece/:jobId/:r/:c', async (req, res) => {
     } catch (e) {
         console.error("Error aislando pieza:", e);
         res.status(500).send("Fallo al generar archivo 3D individual.");
+    }
+});
+
+// Endpoint para listar todos los jobs creados
+app.get('/api/jobs', (req, res) => {
+    try {
+        const files = fs.readdirSync(JOBS_DIR);
+        const jobs = [];
+        
+        files.forEach(file => {
+            if (file.endsWith('.json')) {
+                const jobId = file.replace('.json', '');
+                const metaRaw = fs.readFileSync(path.join(JOBS_DIR, file), 'utf-8');
+                try {
+                    const meta = JSON.parse(metaRaw);
+                    const stats = fs.statSync(path.join(JOBS_DIR, file));
+                    jobs.push({
+                        id: jobId,
+                        date: stats.mtime,
+                        metadata: meta
+                    });
+                } catch(e) {
+                    // Ignore parsing errors for individual files
+                }
+            }
+        });
+        
+        // Ordenar del más reciente al más antiguo
+        jobs.sort((a, b) => b.date - a.date);
+        
+        res.json(jobs);
+    } catch (err) {
+        console.error("Error leyendo jobs:", err);
+        res.status(500).json({ error: "No se pudieron obtener los trabajos" });
     }
 });
 

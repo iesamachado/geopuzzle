@@ -1,0 +1,79 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Funciones helper ──────────────────────────────────────────────────────
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isApproved() {
+      return isSignedIn() &&
+        get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data.rol == 'aprobado';
+    }
+
+    function isAdmin() {
+      return isSignedIn() &&
+        get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data.rol == 'admin';
+    }
+
+    function isAdminOrApproved() {
+      return isAdmin() || isApproved();
+    }
+
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    // ── Usuarios ─────────────────────────────────────────────────────────────
+    // Un usuario puede leer y crear su propio perfil.
+    // Solo admin puede actualizar el rol.
+    match /usuarios/{uid} {
+      allow read: if isOwner(uid) || isAdmin();
+      allow create: if isOwner(uid);
+      allow update: if isAdmin() || (isOwner(uid) && !('rol' in request.resource.data.diff(resource.data).affectedKeys()));
+      allow delete: if isAdmin();
+    }
+
+    // ── Solicitudes ───────────────────────────────────────────────────────────
+    // Cualquier usuario autenticado puede crear su propia solicitud.
+    // Solo admin puede leer, actualizar o eliminar.
+    match /solicitudes/{docId} {
+      allow create: if isSignedIn();
+      allow read, update, delete: if isAdmin();
+    }
+
+    // ── Foro ──────────────────────────────────────────────────────────────────
+    // Solo usuarios aprobados o admin pueden operar.
+    // El autor o admin pueden eliminar/editar un hilo.
+    match /foro/{threadId} {
+      allow read: if isAdminOrApproved();
+      allow create: if isAdminOrApproved();
+      allow update: if isAdmin() || (isApproved() && request.auth.uid == resource.data.autorId);
+      allow delete: if isAdmin() || (isApproved() && request.auth.uid == resource.data.autorId);
+
+      // Respuestas dentro de un hilo
+      match /respuestas/{replyId} {
+        allow read: if isAdminOrApproved();
+        allow create: if isAdminOrApproved();
+        allow update, delete: if isAdmin() || (isApproved() && request.auth.uid == resource.data.autorId);
+      }
+    }
+
+    // ── Cuadrantes ────────────────────────────────────────────────────────────
+    // Cualquier usuario aprobado puede leer y asignarse UN cuadrante libre.
+    // Solo admin puede liberar o hacer cambios arbitrarios.
+    match /cuadrantes/{cuadranteId} {
+      allow read: if isAdminOrApproved();
+
+      // Admin puede escribir libremente (inicialización, reset)
+      allow write: if isAdmin();
+
+      // Usuario aprobado puede asignarse un cuadrante libre (no cambiar centroId si ya existe)
+      allow update: if isApproved()
+        && resource.data.asignado == false      // solo si estaba libre
+        && request.resource.data.asignado == true
+        && request.resource.data.centroId == request.auth.uid;
+    }
+  }
+}

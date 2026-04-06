@@ -582,15 +582,75 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const creatorView = document.getElementById('creator-view');
     const downloaderView = document.getElementById('downloader-view');
+    const jobsView = document.getElementById('jobs-view');
+    
     const btnBackCreator = document.getElementById('btn-back-creator');
+    const btnBackCreatorFromJobs = document.getElementById('btn-back-creator-from-jobs');
+    const btnViewJobs = document.getElementById('btn-view-jobs');
+    
     const jobGuideImg = document.getElementById('job-guide-img');
     const piecesGrid = document.getElementById('pieces-grid');
+    const jobsList = document.getElementById('jobs-list');
 
-    btnBackCreator.addEventListener('click', () => {
+    function showCreatorView() {
         downloaderView.classList.add('hidden');
+        jobsView.classList.add('hidden');
         creatorView.classList.remove('hidden');
-        // Obliga a Leaflet a recalcular su tamaño porque estuvo oculto (display: none)
         map.invalidateSize();
+    }
+
+    btnBackCreator.addEventListener('click', showCreatorView);
+    btnBackCreatorFromJobs.addEventListener('click', showCreatorView);
+
+    btnViewJobs.addEventListener('click', async () => {
+        creatorView.classList.add('hidden');
+        downloaderView.classList.add('hidden');
+        jobsView.classList.remove('hidden');
+        
+        jobsList.innerHTML = "Cargando trabajos locales...";
+        
+        try {
+            const res = await fetch('http://localhost:3000/api/jobs');
+            if (!res.ok) throw new Error("Falla al cargar listado");
+            const jobs = await res.json();
+            
+            if (jobs.length === 0) {
+                jobsList.innerHTML = "<p>No hay mapas creados todavía.</p>";
+                return;
+            }
+            
+            jobsList.innerHTML = "";
+            jobs.forEach(job => {
+                const div = document.createElement('div');
+                div.className = 'card';
+                div.style = "padding: 16px; border: 1px solid var(--border-color); border-radius: 8px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: background 0.2s; background: var(--panel-bg);";
+                div.onmouseover = () => div.style.background = 'var(--hover-bg, #334155)';
+                div.onmouseout = () => div.style.background = 'var(--panel-bg)';
+                
+                const d = new Date(job.date).toLocaleString('es-ES', { dateStyle: 'short', timeStyle: 'short' });
+                
+                div.innerHTML = `
+                    <div>
+                        <div style="font-weight: 600; font-size: 1.1rem; color: var(--accent-color);">Mapa de ${job.metadata.totalSizeX}x${job.metadata.totalSizeY} mm</div>
+                        <div style="font-size: 0.85rem; color: #94a3b8; margin-top: 4px;">Z Final: ${job.metadata.zFinalMm}mm | Cama: ${job.metadata.bedSizeMm}mm</div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 8px;">${d}</div>
+                        <span style="font-size: 0.85rem; padding: 4px 8px; border-radius: 4px; border: 1px solid var(--accent-color); color: var(--accent-color);">Cargar STLs</span>
+                    </div>
+                `;
+                
+                div.onclick = () => {
+                    jobsView.classList.add('hidden');
+                    openJobDashboard(job.id);
+                };
+                
+                jobsList.appendChild(div);
+            });
+            
+        } catch(e) {
+            jobsList.innerHTML = "<p>Error de conexión con Backend de Docker.</p>";
+        }
     });
 
     async function openJobDashboard(jobId) {
@@ -607,6 +667,8 @@ document.addEventListener('DOMContentLoaded', () => {
             
             if (data.guideImage) {
                 jobGuideImg.src = data.guideImage;
+            } else {
+                jobGuideImg.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23334155'/%3E%3Ctext x='50' y='50' fill='white' text-anchor='middle' dominant-baseline='middle'%3ESin Guía%3C/text%3E%3C/svg%3E";
             }
             
             piecesGrid.innerHTML = "";

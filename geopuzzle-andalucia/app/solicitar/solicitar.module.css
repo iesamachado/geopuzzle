@@ -1,0 +1,120 @@
+.pageWrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 100px 24px 40px;
+  background: radial-gradient(ellipse 60% 40% at 50% 0%, rgba(245,158,11,0.08) 0%, transparent 60%),
+              var(--color-noche);
+}
+
+.formCard {
+  background: var(--color-noche-light);
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  padding: 40px;
+  width: 100%;
+  max-width: 640px;
+}
+
+.formHeader {
+  margin-bottom: 32px;
+  text-align: center;
+}
+
+.formHeader h1 {
+  font-size: 1.8rem;
+  margin-bottom: 8px;
+}
+
+.formHeader p {
+  color: var(--color-text-muted);
+  font-size: 0.95rem;
+}
+
+.steps {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 32px;
+  padding: 0 8px;
+}
+
+.stepItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+.stepItem.active {
+  color: var(--color-acento);
+}
+
+.stepNum {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--color-border);
+  font-size: 0.75rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stepItem.active .stepNum {
+  background: var(--color-acento);
+  color: var(--color-noche);
+}
+
+.stepLine {
+  flex: 1;
+  height: 1px;
+  background: var(--color-border);
+}
+
+.formSection {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.formSection h2 {
+  font-size: 1.1rem;
+  margin-bottom: -8px;
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.successCard {
+  background: var(--color-noche-light);
+  border: 1px solid var(--color-verde);
+  border-radius: 16px;
+  padding: 48px;
+  width: 100%;
+  max-width: 480px;
+  text-align: center;
+}
+
+.successCard h1 {
+  font-size: 1.8rem;
+  margin-bottom: 16px;
+}
+
+.successCard p {
+  color: var(--color-text-muted);
+  margin-bottom: 8px;
+  line-height: 1.7;
+}
+
+@media (max-width: 600px) {
+  .formRow { grid-template-columns: 1fr; }
+  .formCard { padding: 24px; }
+}

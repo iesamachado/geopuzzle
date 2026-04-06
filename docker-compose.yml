@@ -18,3 +18,5 @@ services:
       # Asignamos hasta 8GB de RAM al motor V8 de Node para poder exportar matrices masivas
       - NODE_OPTIONS=--max_old_space_size=8192
       - PORT=3000
+    volumes:
+      - ./backend/jobs:/app/jobs
