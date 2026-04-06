@@ -1,0 +1,7 @@
+1:"$Sreact.fragment"
+2:I[92825,["/geopuzzle/_next/static/chunks/01xlw8hd842-c.js","/geopuzzle/_next/static/chunks/0g2pm7zws6_y9.js","/geopuzzle/_next/static/chunks/0d3shmwh5_nmn.js"],"ClientSegmentRoot"]
+3:I[82391,["/geopuzzle/_next/static/chunks/01xlw8hd842-c.js","/geopuzzle/_next/static/chunks/0g2pm7zws6_y9.js","/geopuzzle/_next/static/chunks/0d3shmwh5_nmn.js","/geopuzzle/_next/static/chunks/0az48t1h~xssc.js"],"default"]
+4:I[39756,["/geopuzzle/_next/static/chunks/01xlw8hd842-c.js","/geopuzzle/_next/static/chunks/0g2pm7zws6_y9.js","/geopuzzle/_next/static/chunks/0d3shmwh5_nmn.js"],"default"]
+5:I[37457,["/geopuzzle/_next/static/chunks/01xlw8hd842-c.js","/geopuzzle/_next/static/chunks/0g2pm7zws6_y9.js","/geopuzzle/_next/static/chunks/0d3shmwh5_nmn.js"],"default"]
+0:{"rsc":["$","$1","c",{"children":[[["$","script","script-0",{"src":"/geopuzzle/_next/static/chunks/0az48t1h~xssc.js","async":true}]],["$","$L2",null,{"Component":"$3","slots":{"children":["$","$L4",null,{"parallelRouterKey":"children","template":["$","$L5",null,{}]}]},"serverProvidedParams":{"params":{},"promises":["$@6"]}}]]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"K6e8pOns8tM-plddTjWNi"}
+6:"$0:rsc:props:children:1:props:serverProvidedParams:params"
