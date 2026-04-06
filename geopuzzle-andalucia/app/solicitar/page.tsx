@@ -1,3 +1,5 @@
+'use client';
+
 import { useState, useEffect } from 'react';
 import { signInWithPopup } from 'firebase/auth';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
@@ -63,7 +65,7 @@ export default function SolicitarPage() {
         nombre: user.displayName || '',
       }));
       setStep(2);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
       setError('Error al identificarte con Google.');
     } finally {
@@ -108,9 +110,10 @@ export default function SolicitarPage() {
       });
 
       setStep('done');
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
-      setError(`Error al enviar la solicitud: ${err.message}`);
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      setError(`Error al enviar la solicitud: ${errorMessage}`);
     } finally {
       setLoading(false);
     }

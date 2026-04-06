@@ -1,0 +1,109 @@
+
+/media/disco/dades/src/maps3d/geopuzzle-andalucia/app/dashboard/admin/page.tsx
+   22:6   warning  React Hook useEffect has a missing dependency: 'router'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  177:17  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                            react/no-unescaped-entities
+  177:32  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                            react/no-unescaped-entities
+
+/media/disco/dades/src/maps3d/geopuzzle-andalucia/app/dashboard/foro/page.tsx
+    5:70  warning  'eliminarHilo' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               @typescript-eslint/no-unused-vars
+   12:26  warning  'isAdmin' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           @typescript-eslint/no-unused-vars
+   31:5   error    Error: Cannot access variable before it is declared
+
+`loadHilos` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+/media/disco/dades/src/maps3d/geopuzzle-andalucia/app/dashboard/foro/page.tsx:31:5
+  29 |
+  30 |   useEffect(() => {
+> 31 |     loadHilos();
+     |     ^^^^^^^^^ `loadHilos` accessed before it is declared
+  32 |   }, []);
+  33 |
+  34 |   async function loadHilos() {
+
+/media/disco/dades/src/maps3d/geopuzzle-andalucia/app/dashboard/foro/page.tsx:34:3
+  32 |   }, []);
+  33 |
+> 34 |   async function loadHilos() {
+     |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 35 |     setLoading(true);
+     | ^^^^^^^^^^^^^^^^^^^^^
+> 36 |     const data = await obtenerHilos();
+     | ^^^^^^^^^^^^^^^^^^^^^
+> 37 |     setHilos(data);
+     | ^^^^^^^^^^^^^^^^^^^^^
+> 38 |     setLoading(false);
+     | ^^^^^^^^^^^^^^^^^^^^^
+> 39 |   }
+     | ^^^^ `loadHilos` is declared here
+  40 |
+  41 |   async function openHilo(hilo: ForumThread) {
+  42 |     setSelectedHilo(hilo);  react-hooks/immutability
+  286:24  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               @typescript-eslint/no-explicit-any
+
+/media/disco/dades/src/maps3d/geopuzzle-andalucia/app/dashboard/layout.tsx
+  25:6  warning  React Hook useEffect has a missing dependency: 'router'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/media/disco/dades/src/maps3d/geopuzzle-andalucia/app/dashboard/mapa/page.tsx
+  19:5  error    Error: Cannot access variable before it is declared
+
+`loadCuadrantes` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+/media/disco/dades/src/maps3d/geopuzzle-andalucia/app/dashboard/mapa/page.tsx:19:5
+  17 |
+  18 |   useEffect(() => {
+> 19 |     loadCuadrantes();
+     |     ^^^^^^^^^^^^^^ `loadCuadrantes` accessed before it is declared
+  20 |   }, []);
+  21 |
+  22 |   async function loadCuadrantes() {
+
+/media/disco/dades/src/maps3d/geopuzzle-andalucia/app/dashboard/mapa/page.tsx:22:3
+  20 |   }, []);
+  21 |
+> 22 |   async function loadCuadrantes() {
+     |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 23 |     setLoading(true);
+     | ^^^^^^^^^^^^^^^^^^^^^
+> 24 |     try {
+     …
+     | ^^^^^^^^^^^^^^^^^^^^^
+> 37 |     setLoading(false);
+     | ^^^^^^^^^^^^^^^^^^^^^
+> 38 |   }
+     | ^^^^ `loadCuadrantes` is declared here
+  39 |
+  40 |   async function initCuadrantes() {
+  41 |     for (const c of CUADRANTES_INICIALES) {  react-hooks/immutability
+  20:6  warning  React Hook useEffect has a missing dependency: 'loadCuadrantes'. Either include it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      react-hooks/exhaustive-deps
+
+/media/disco/dades/src/maps3d/geopuzzle-andalucia/app/dashboard/page.tsx
+  6:20  warning  'user' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/media/disco/dades/src/maps3d/geopuzzle-andalucia/app/login/page.tsx
+   7:10  warning  'useAuth' is defined but never used                                                                                                                                                                                                                                                      @typescript-eslint/no-unused-vars
+  22:19  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  77:19  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+/media/disco/dades/src/maps3d/geopuzzle-andalucia/app/solicitar/page.tsx
+   66:19  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  111:19  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  168:19  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+/media/disco/dades/src/maps3d/geopuzzle-andalucia/components/Navbar.tsx
+  5:8   warning  'styles' is defined but never used            @typescript-eslint/no-unused-vars
+  8:17  warning  'profile' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/media/disco/dades/src/maps3d/geopuzzle-andalucia/components/SituacionAprendizaje.tsx
+  128:13  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  128:36  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+/media/disco/dades/src/maps3d/geopuzzle-andalucia/lib/firestore.ts
+  3:28  warning  'where' is defined but never used      @typescript-eslint/no-unused-vars
+  3:52  warning  'Timestamp' is defined but never used  @typescript-eslint/no-unused-vars
+
+/media/disco/dades/src/maps3d/geopuzzle-andalucia/lib/seed-firestore.ts
+  1:10  warning  'collection' is defined but never used  @typescript-eslint/no-unused-vars
+  1:27  warning  'setDoc' is defined but never used      @typescript-eslint/no-unused-vars
+
+✖ 25 problems (10 errors, 15 warnings)
+

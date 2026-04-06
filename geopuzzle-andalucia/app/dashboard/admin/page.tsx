@@ -174,7 +174,7 @@ export default function AdminPage() {
                 <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>{s.centroeducativo}</span>
               </div>
               <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem', lineHeight: 1.6 }}>
-                "{s.motivacion}"
+                &quot;{s.motivacion}&quot;
               </p>
             </div>
           ))}

@@ -15,10 +15,6 @@ export default function MapaPage() {
   const [selected, setSelected] = useState<Cuadrante | null>(null);
   const [assigning, setAssigning] = useState(false);
 
-  useEffect(() => {
-    loadCuadrantes();
-  }, []);
-
   async function loadCuadrantes() {
     setLoading(true);
     try {
@@ -48,6 +44,11 @@ export default function MapaPage() {
       });
     }
   }
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    loadCuadrantes();
+  }, []);
 
   async function handleAsignar(cuadrante: Cuadrante) {
     if (!user || !profile) return;

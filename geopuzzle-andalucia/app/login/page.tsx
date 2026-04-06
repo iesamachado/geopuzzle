@@ -19,7 +19,7 @@ export default function LoginPage() {
     try {
       await signInWithPopup(auth, googleProvider);
       router.push('/dashboard');
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
       setError('Error al iniciar sesión con Google. Inténtalo de nuevo.');
     } finally {

@@ -125,7 +125,7 @@ export default function SituacionAprendizaje() {
           <p className="section-eyebrow">Documentación Pedagógica · LOMLOE/BOJA</p>
           <h2 className="section-title">Situación de Aprendizaje</h2>
           <p className="section-subtitle" style={{ margin: '0 auto' }}>
-            "Andalucía en Tus Manos" — Diseñada y referenciada según el currículo oficial
+            &quot;Andalucía en Tus Manos&quot; — Diseñada y referenciada según el currículo oficial
             andaluz (Orden 30 mayo 2023, BOJA nº 104) para 3º y 4º de ESO.
           </p>
         </div>

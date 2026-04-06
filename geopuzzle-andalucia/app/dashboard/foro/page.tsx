@@ -27,16 +27,17 @@ export default function ForoPage() {
   const [newReply, setNewReply] = useState('');
   const [sendingReply, setSendingReply] = useState(false);
 
-  useEffect(() => {
-    loadHilos();
-  }, []);
-
   async function loadHilos() {
     setLoading(true);
     const data = await obtenerHilos();
     setHilos(data);
     setLoading(false);
   }
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    loadHilos();
+  }, []);
 
   async function openHilo(hilo: ForumThread) {
     setSelectedHilo(hilo);
@@ -283,6 +284,7 @@ export default function ForoPage() {
   );
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function formatDate(d: any): string {
   const date = d?.toDate ? d.toDate() : new Date(d);
   return date.toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });

@@ -1,0 +1,73 @@
+
+/media/disco/dades/src/maps3d/geopuzzle-andalucia/app/dashboard/admin/page.tsx
+  22:6  warning  React Hook useEffect has a missing dependency: 'router'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/media/disco/dades/src/maps3d/geopuzzle-andalucia/app/dashboard/foro/page.tsx
+    5:70  warning  'eliminarHilo' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               @typescript-eslint/no-unused-vars
+   12:26  warning  'isAdmin' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           @typescript-eslint/no-unused-vars
+   38:5   error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/media/disco/dades/src/maps3d/geopuzzle-andalucia/app/dashboard/foro/page.tsx:38:5
+  36 |
+  37 |   useEffect(() => {
+> 38 |     loadHilos();
+     |     ^^^^^^^^^ Avoid calling setState() directly within an effect
+  39 |   }, []);
+  40 |
+  41 |   async function openHilo(hilo: ForumThread) {  react-hooks/set-state-in-effect
+  286:24  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               @typescript-eslint/no-explicit-any
+
+/media/disco/dades/src/maps3d/geopuzzle-andalucia/app/dashboard/layout.tsx
+  25:6  warning  React Hook useEffect has a missing dependency: 'router'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/media/disco/dades/src/maps3d/geopuzzle-andalucia/app/dashboard/mapa/page.tsx
+  49:5  error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/media/disco/dades/src/maps3d/geopuzzle-andalucia/app/dashboard/mapa/page.tsx:49:5
+  47 |
+  48 |   useEffect(() => {
+> 49 |     loadCuadrantes();
+     |     ^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  50 |   }, []);
+  51 |
+  52 |   async function handleAsignar(cuadrante: Cuadrante) {  react-hooks/set-state-in-effect
+  50:6  warning  React Hook useEffect has a missing dependency: 'loadCuadrantes'. Either include it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        react-hooks/exhaustive-deps
+
+/media/disco/dades/src/maps3d/geopuzzle-andalucia/app/dashboard/page.tsx
+  6:20  warning  'user' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/media/disco/dades/src/maps3d/geopuzzle-andalucia/app/login/page.tsx
+   7:10  warning  'useAuth' is defined but never used                                                                                                                                                                                                                                                      @typescript-eslint/no-unused-vars
+  77:19  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+/media/disco/dades/src/maps3d/geopuzzle-andalucia/app/solicitar/page.tsx
+  111:19  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  113:57  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  168:19  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+/media/disco/dades/src/maps3d/geopuzzle-andalucia/components/Navbar.tsx
+  5:8   warning  'styles' is defined but never used            @typescript-eslint/no-unused-vars
+  8:17  warning  'profile' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/media/disco/dades/src/maps3d/geopuzzle-andalucia/lib/firestore.ts
+  3:28  warning  'where' is defined but never used      @typescript-eslint/no-unused-vars
+  3:52  warning  'Timestamp' is defined but never used  @typescript-eslint/no-unused-vars
+
+/media/disco/dades/src/maps3d/geopuzzle-andalucia/lib/seed-firestore.ts
+  1:10  warning  'collection' is defined but never used  @typescript-eslint/no-unused-vars
+  1:27  warning  'setDoc' is defined but never used      @typescript-eslint/no-unused-vars
+
+✖ 20 problems (5 errors, 15 warnings)
+
