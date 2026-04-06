@@ -8,7 +8,6 @@ yarn-error.log*
 # Jobs and temporary processing files
 backend/jobs/
 *.bin
-*.json
 *.zip
 
 # OS generated files
